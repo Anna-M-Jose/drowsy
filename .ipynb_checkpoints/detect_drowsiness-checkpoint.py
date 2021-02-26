@@ -6,19 +6,19 @@ from scipy.spatial import distance as dist
 from imutils import face_utils
 from threading import Thread
 import numpy as np
-import playsound
+#import playsound
 import argparse
 import imutils
 import time
 import dlib
 import cv2
-import Jetson.GPIO as gp
+print(dlib.DLIB_USE_CUDA)
 dlib.DLIB_USE_CUDA=True
 
 def sound_alarm(path):
 	print("Warning! Warning!")
 	# play an alarm sound
-	playsound.playsound(path)
+	#playsound.playsound(path)
 
 def eye_aspect_ratio(eye):
 	# compute the euclidean distances between the two sets of
@@ -40,8 +40,8 @@ def eye_aspect_ratio(eye):
 ap = argparse.ArgumentParser()
 # ap.add_argument("-p", "--shape-predictor", required=True,
 # 	help="path to facial landmark predictor")
-#ap.add_argument("-a", "--alarm", type=str, default="",
-#	help="path alarm .WAV file")
+ap.add_argument("-a", "--alarm", type=str, default="",
+	help="path alarm .WAV file")
 ap.add_argument("-w", "--webcam", type=int, default=0,
 	help="index of webcam on system")
 args = vars(ap.parse_args())
@@ -82,10 +82,6 @@ print("[INFO] starting video stream thread...")
 # Creating a new camera object to read images from the CSI camera interface, using the CSICamera constructor. For deocumentation, refer to jetpack docs.
 vs = CSICamera(width=1280,height=720)
 time.sleep(1.0)
-
-print("Initialising GPIO")
-gp.setmode(gp.BCM) # Use BCM pin labels
-gp.setup(18,gp.OUTPUT) # Set D18 as OUTPUT for buzzer
 
 # loop over frames from the video stream
 while True:
@@ -139,12 +135,11 @@ while True:
 					# check to see if an alarm file was supplied,
 					# and if so, start a thread to have the alarm
 					# sound played in the background
-					gp.output(18,gp.HIGH) # Turn on the buzzer
-					# if  True :
-					# 	t = Thread(target=sound_alarm,
-					# 		args=("./alarm.wav",))
-					# 	t.deamon = True
-					# 	t.start()
+					if args["alarm"] != "":
+						t = Thread(target=sound_alarm,
+							args=(args["alarm"],))
+						t.deamon = True
+						t.start()
 
 				# draw an alarm on the frame
 				cv2.putText(frame, "DROWSINESS ALERT!", (10, 30),
@@ -155,7 +150,6 @@ while True:
 		else:
 			COUNTER = 0
 			ALARM_ON = False
-			gp.output(18,gp.LOW)
 
 		# draw the computed eye aspect ratio on the frame to help
 		# with debugging and setting the correct eye aspect ratio
