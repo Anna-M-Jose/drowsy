@@ -6,7 +6,7 @@ from scipy.spatial import distance as dist
 from imutils import face_utils
 from threading import Thread
 import numpy as np
-import playsound
+#import playsound
 import argparse
 import imutils
 import time
@@ -18,7 +18,7 @@ dlib.DLIB_USE_CUDA=True
 def sound_alarm(path):
 	print("Warning! Warning!")
 	# play an alarm sound
-	playsound.playsound(path)
+	# playsound.playsound(path)
 
 def eye_aspect_ratio(eye):
 	# compute the euclidean distances between the two sets of
