@@ -85,7 +85,7 @@ time.sleep(1.0)
 
 print("Initialising GPIO")
 gp.setmode(gp.BCM) # Use BCM pin labels
-gp.setup(18,gp.OUTPUT) # Set D18 as OUTPUT for buzzer
+gp.setup(18,gp.OUT) # Set D18 as OUTPUT for buzzer
 
 # loop over frames from the video stream
 while True:
