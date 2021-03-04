@@ -20,6 +20,23 @@ def sound_alarm(path):
 	# play an alarm sound
 	# playsound.playsound(path)
 
+def buzzer(state):
+	if state:
+		gp.output(BUZZER,gp.HIGH)
+	else:
+		gp.output(BUZZER,gp.LOW)
+
+def motor(cw,ccw):
+	if cw and not ccw:
+		gp.output(m1a,gp.HIGH)
+		gp.output(m1b,gp.LOW)
+	elif ccw and not cw:
+		gp.output(m1a,gp.LOW)
+		gp.output(m1b,gp.HIGH)
+	else :
+		gp.output(m1a,gp.LOW)
+		gp.output(m1b,gp.LOW)
+
 def eye_aspect_ratio(eye):
 	# compute the euclidean distances between the two sets of
 	# vertical eye landmarks (x, y)-coordinates
@@ -84,8 +101,11 @@ vs = CSICamera(width=1280,height=720)
 time.sleep(1.0)
 
 print("Initialising GPIO")
+BUZZER = 24
+m1a = 18
+m1b = 23
 gp.setmode(gp.BCM) # Use BCM pin labels
-gp.setup(18,gp.OUTPUT) # Set D18 as OUTPUT for buzzer
+gp.setup([BUZZER,m1a,m1b],gp.OUTPUT,initial = gp.LOW) # Set three pins as OUTPUT for buzzer and motors.
 
 # loop over frames from the video stream
 while True:
@@ -139,12 +159,14 @@ while True:
 					# check to see if an alarm file was supplied,
 					# and if so, start a thread to have the alarm
 					# sound played in the background
-					gp.output(18,gp.HIGH) # Turn on the buzzer
+				 	
 					# if  True :
 					# 	t = Thread(target=sound_alarm,
 					# 		args=("./alarm.wav",))
 					# 	t.deamon = True
 					# 	t.start()
+					buzzer(True)
+					motor(True,False)
 
 				# draw an alarm on the frame
 				cv2.putText(frame, "DROWSINESS ALERT!", (10, 30),
@@ -155,7 +177,8 @@ while True:
 		else:
 			COUNTER = 0
 			ALARM_ON = False
-			gp.output(18,gp.LOW)
+			buzzer(False)
+			motor(False,False)
 
 		# draw the computed eye aspect ratio on the frame to help
 		# with debugging and setting the correct eye aspect ratio
