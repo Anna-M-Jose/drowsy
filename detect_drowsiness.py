@@ -74,6 +74,7 @@ EYE_AR_CONSEC_FRAMES = 5
 # indicate if the alarm is going off
 COUNTER = 0
 ALARM_ON = False
+WARNED = False
 
 # initialize dlib's face detector (HOG-based) and then create
 # the facial landmark predictor
@@ -105,7 +106,7 @@ BUZZER = 24
 m1a = 18
 m1b = 23
 gp.setmode(gp.BCM) # Use BCM pin labels
-gp.setup([BUZZER,m1a,m1b],gp.OUTPUT,initial = gp.LOW) # Set three pins as OUTPUT for buzzer and motors.
+gp.setup([BUZZER,m1a,m1b],gp.OUT,initial = gp.LOW) # Set three pins as OUTPUT for buzzer and motors.
 
 # loop over frames from the video stream
 while True:
@@ -166,7 +167,11 @@ while True:
 					# 	t.deamon = True
 					# 	t.start()
 					buzzer(True)
-					motor(True,False)
+					if WARNED:
+						motor(True,False)
+						WARNED = False
+					else:
+						WARNED = True
 
 				# draw an alarm on the frame
 				cv2.putText(frame, "DROWSINESS ALERT!", (10, 30),
@@ -197,3 +202,4 @@ while True:
 # do a bit of cleanup
 cv2.destroyAllWindows()
 vs.stop()
+gp.cleanup()
